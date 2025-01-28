@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  next:
+    build: ./next
+    command: npm run dev
+    volumes:
+      - ./next:/next
+      - /next/node_modules
+    ports:
+      - 3000:3000
