@@ -4,10 +4,15 @@ import Keycloak from "next-auth/providers/keycloak";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Keycloak],
   callbacks: {
-    jwt({ token, user, account, trigger }) {
+    signIn({ profile }) {
+      // use profile.sub to get user from db; if no user returned, use profile.email and if found, set the sub
+      // otherwise, return false
+      return true;
+    },
+    jwt({ token, account, trigger }) {
       if (trigger === "signIn") {
-        //todo: from db, get user U associated with token's sub, and write some of U's properties into token
         token.idToken = account?.id_token;
+        // get user and write stuff from user to token (e.g. is_gov, roles, etc.)
       }
       return token;
     },

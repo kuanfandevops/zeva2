@@ -1,14 +1,25 @@
-"use client";
-import { keycloakSignIn } from "./actions/keycloak";
+import { keycloakSignIn } from "./lib/actions/keycloak";
 
 export default function Home() {
   return (
     <div>
-      <button onClick={() => keycloakSignIn("bceidbusiness")}>
+      <button
+        onClick={async () => {
+          "use server";
+          await keycloakSignIn("bceidbusiness");
+        }}
+      >
         Sign in with BCeID
       </button>
       <br />
-      <button onClick={() => keycloakSignIn("idir")}>Sign in with IDIR</button>
+      <button
+        onClick={async () => {
+          "use server";
+          await keycloakSignIn("idir");
+        }}
+      >
+        Sign in with IDIR
+      </button>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { keycloakSignOut } from "../actions/keycloak";
+import { keycloakSignOut } from "../lib/actions/keycloak";
 
 export default async function Dashboard() {
   const session = await auth();
