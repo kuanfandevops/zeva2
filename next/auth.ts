@@ -12,7 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, account, trigger }) {
       if (trigger === "signIn") {
         token.idToken = account?.id_token;
-        // get user and write stuff from user to token (e.g. is_gov, roles, etc.)
+        // todo: get user and write stuff from user to token (e.g. is_gov, roles, etc.)
       }
       return token;
     },
@@ -21,6 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (idToken) {
         session.user.idToken = idToken;
       }
+      // todo: get other fields from token (e.g. is_gov, roles, etc.) and write to session
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {

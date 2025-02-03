@@ -1,25 +1,14 @@
-import { keycloakSignIn } from "./lib/actions/keycloak";
+import { keycloakSignIn } from "@/app/lib/actions/keycloak";
+import { Button } from "@/app/lib/components/Button";
 
 export default function Home() {
+  const bceidSignin = keycloakSignIn.bind(null, "bceidbusiness");
+  const idirSignin = keycloakSignIn.bind(null, "idir");
   return (
     <div>
-      <button
-        onClick={async () => {
-          "use server";
-          await keycloakSignIn("bceidbusiness");
-        }}
-      >
-        Sign in with BCeID
-      </button>
+      <Button onClick={bceidSignin}>Sign in with BCeID</Button>
       <br />
-      <button
-        onClick={async () => {
-          "use server";
-          await keycloakSignIn("idir");
-        }}
-      >
-        Sign in with IDIR
-      </button>
+      <Button onClick={idirSignin}>Sign in with IDIR</Button>
     </div>
   );
 }

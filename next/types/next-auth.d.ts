@@ -1,13 +1,14 @@
-import NextAuth from "next-auth";
-
-declare module "next-auth" {
-  interface User extends DefaultUser {
+declare module "@auth/core/types" {
+  interface User {
     idToken?: string;
   }
 }
 
 declare module "@auth/core/jwt" {
-  interface JWT extends Record<string, unknown>, DefaultJWT {
+  interface JWT {
     idToken?: string;
   }
 }
+
+//need an export statement so that typescript recognizes this file as a module
+export {};
