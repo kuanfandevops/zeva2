@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "./generated/clientOld"
+  provider        = "prisma-client-js"
+  output          = "./generated/clientOld"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {

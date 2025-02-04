@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run pushSchemaToDB && next dev --turbopack",
-    "pushSchemaToDB": "prisma db push --schema prisma/schema.prisma --accept-data-loss",
+    "pushSchemaToDB": "prisma format && prisma db push --schema prisma/schema.prisma --accept-data-loss",
     "seedFromOldDB": "prisma db push --schema prisma/schema.prisma --force-reset && prisma db pull --schema prisma/schemaOld.prisma && prisma generate --schema prisma/schemaOld.prisma && prisma db seed",
     "build": "next build",
     "start": "next start",

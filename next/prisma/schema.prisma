@@ -1,12 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  output = "./generated/client"
+  provider        = "prisma-client-js"
+  output          = "./generated/client"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -14,8 +9,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// prisma doesn't allow enum values to start with a number
+enum ModelYear {
+  MY_2019 @map("2019")
+  MY_2020 @map("2020")
+  MY_2021 @map("2021")
+  MY_2022 @map("2022")
+  MY_2023 @map("2023")
+  MY_2024 @map("2024")
+  MY_2025 @map("2025")
+  MY_2026 @map("2026")
+  MY_2027 @map("2027")
+  MY_2028 @map("2028")
+  MY_2029 @map("2029")
+  MY_2030 @map("2030")
+  MY_2031 @map("2031")
+  MY_2032 @map("2032")
+  MY_2033 @map("2033")
+  MY_2034 @map("2034")
+  MY_2035 @map("2035")
+}
+
+model Organization {
+  id             Int       @id @default(autoincrement())
+  name           String
+  isGovernment   Boolean   @default(false) @map("is_government")
+  firstModelYear ModelYear @map("first_model_year")
+  users          User[]
+
+  @@map("organization")
+}
+
+enum Role {
+  ADMINISTRATOR              @map("Administrator")
+  DIRECTOR                   @map("Director")
+  ENGINEER_ANALYST           @map("Engineer/Analyst")
+  ORGANIZATION_ADMINISTRATOR @map("Organization Administrator")
+  SIGNING_AUTHORITY          @map("Signing Authority")
+  ZEVA_USER                  @map("ZEVA User")
+}
+
+enum Idp {
+  BCEID_BUSINESS @map("bceidbusiness")
+  IDIR           @map("idir")
+}
+
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id             Int          @id @default(autoincrement())
+  email          String?
+  keycloakId     String?      @map("keycloak_id")
+  idp            Idp          @map("idp")
+  idpUsername    String       @map("idp_username")
+  isActive       Boolean      @default(true) @map("is_active")
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int          @map("organization_id")
+  roles          Role[]
+
+  @@unique([idp, idpUsername])
+  @@map("user")
 }
