@@ -1,30 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { prismaOld } from "@/lib/prismaOld";
 import { ModelYear, Role, Idp } from "./generated/client";
+import { getModelYearEnum, getRoleEnum } from "@/lib/utils/getEnums";
 
 // prismaOld to interact with old zeva db; prisma to interact with new zeva db
 const main = async () => {
-  const mapOfModelYearIdsToModelYearEnum: { [id: number]: ModelYear } = {};
-  const mapOfRoleIdsToRoleEnum: { [id: number]: Role } = {};
+  const mapOfModelYearIdsToModelYearEnum: {
+    [id: number]: ModelYear | undefined;
+  } = {};
+  const mapOfRoleIdsToRoleEnum: { [id: number]: Role | undefined } = {};
   const mapOfOldOrgIdsToNewOrgIds: { [id: number]: number } = {};
   const mapOfOldUserIdsToNewUserIds: { [id: number]: number } = {};
 
   const modelYearsOld = await prismaOld.model_year.findMany();
   for (const modelYearOld of modelYearsOld) {
-    mapOfModelYearIdsToModelYearEnum[modelYearOld.id] =
-      ModelYear[("MY_" + modelYearOld.description) as keyof typeof ModelYear];
+    mapOfModelYearIdsToModelYearEnum[modelYearOld.id] = getModelYearEnum(
+      modelYearOld.description,
+    );
   }
 
   const rolesOld = await prismaOld.role.findMany();
   for (const roleOld of rolesOld) {
-    if (roleOld.role_code === "Engineer/Analyst") {
-      mapOfRoleIdsToRoleEnum[roleOld.id] = Role.ENGINEER_ANALYST;
-    } else {
-      mapOfRoleIdsToRoleEnum[roleOld.id] =
-        Role[
-          roleOld.role_code.toUpperCase().replace(" ", "_") as keyof typeof Role
-        ];
-    }
+    mapOfRoleIdsToRoleEnum[roleOld.id] = getRoleEnum(roleOld.role_code);
   }
 
   // add orgs:
@@ -48,18 +45,19 @@ const main = async () => {
       organization: true,
     },
   });
-  for (const userOld of usersOld) {
+  for (const [index, userOld] of usersOld.entries()) {
     const userNew = await prisma.user.create({
       data: {
-        email: userOld.email,
-        keycloakId: userOld.keycloak_user_id,
+        contactEmail: userOld.email,
+        idpEmail:
+          userOld.keycloak_email ?? "noSuchEmail" + index + "@email.com",
+        idpSub: userOld.keycloak_user_id,
         idp: userOld.organization?.is_government
           ? Idp.IDIR
           : Idp.BCEID_BUSINESS,
         idpUsername: userOld.username,
         isActive: userOld.is_active,
-        organizationId:
-          mapOfOldOrgIdsToNewOrgIds[userOld.organization_id ?? -1],
+        organizationId: mapOfOldOrgIdsToNewOrgIds[userOld.organization_id!],
       },
     });
     mapOfOldUserIdsToNewUserIds[userOld.id] = userNew.id;

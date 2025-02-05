@@ -6,6 +6,7 @@ import {
   mapUser,
 } from "./lib/data/user";
 import { Idp } from "./prisma/generated/client";
+import { getIdpEnum } from "./lib/utils/getEnums";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Keycloak],
@@ -13,23 +14,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, account, profile, trigger }) {
       if (trigger === "signIn") {
         token.idToken = account?.id_token;
-        const keycloakId = profile?.sub;
-        const idp = Idp[profile?.identity_provider as keyof typeof Idp];
+        const idpSub = profile?.sub;
+        const idp = getIdpEnum(profile?.identity_provider);
         let user;
-        if (keycloakId) {
-          user = await findUniqueMappedUser(keycloakId);
+        if (idpSub) {
+          user = await findUniqueMappedUser(idpSub);
         }
         if (!user && idp) {
+          const idpEmail = profile?.email;
           let idpUsername;
           if (idp === Idp.BCEID_BUSINESS) {
             idpUsername = profile?.bceid_username;
           } else if (idp === Idp.IDIR) {
             idpUsername = profile?.idir_username;
           }
-          if (idpUsername) {
-            user = await findUniqueUnmappedUser(idp, idpUsername);
+          if (idpUsername && idpEmail) {
+            user = await findUniqueUnmappedUser(idp, idpUsername, idpEmail);
             if (user) {
-              await mapUser(user.id, keycloakId ?? null);
+              await mapUser(user.id, idpSub ?? null);
             }
           }
         }
@@ -37,6 +39,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.roles = user.roles;
           token.isGovernment = user.organization.isGovernment;
           return token;
+        }
+        if (!user) {
+          console.log("Failed to map user: ", profile);
         }
         return null;
       }

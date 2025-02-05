@@ -2,7 +2,7 @@ declare module "@auth/core/types" {
   interface User {
     idToken?: string;
     roles?: $Enums.Role[];
-    isGovernment? : Boolean;
+    isGovernment?: Boolean;
   }
 }
 
@@ -18,7 +18,7 @@ declare module "@auth/core/jwt" {
   interface JWT {
     idToken?: string;
     roles?: $Enums.Role[];
-    isGovernment? : Boolean;
+    isGovernment?: Boolean;
   }
 }
 

@@ -10,29 +10,6 @@ datasource db {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
-model account_balance {
-  id                    Int                 @id @default(autoincrement())
-  create_timestamp      DateTime?           @db.Timestamptz(6)
-  create_user           String              @db.VarChar(130)
-  update_timestamp      DateTime?           @db.Timestamptz(6)
-  update_user           String?             @db.VarChar(130)
-  effective_date        DateTime?           @db.Date
-  expiration_date       DateTime?           @db.Date
-  balance               Decimal             @db.Decimal(20, 2)
-  credit_transaction_id Int?
-  organization_id       Int
-  credit_class_id       Int
-  credit_class_code     credit_class_code   @relation(fields: [credit_class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "account_balance_credit_class_id_2b46933a_fk_credit_cl")
-  credit_transaction    credit_transaction? @relation(fields: [credit_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "account_balance_credit_transaction_i_c8d0fdaf_fk_credit_tr")
-  organization          organization        @relation(fields: [organization_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "account_balance_organization_id_e366a24f_fk_organization_id")
-
-  @@index([credit_class_id], map: "account_balance_credit_class_id_2b46933a")
-  @@index([credit_transaction_id], map: "account_balance_credit_transaction_id_c8d0fdaf")
-  @@index([organization_id], map: "account_balance_organization_id_e366a24f")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model address_type {
   id                        Int                         @id @default(autoincrement())
   create_timestamp          DateTime?                   @db.Timestamptz(6)
@@ -267,7 +244,6 @@ model credit_class_code {
   create_user                  String                         @db.VarChar(130)
   update_user                  String?                        @db.VarChar(130)
   id                           Int                            @id @default(autoincrement())
-  account_balance              account_balance[]
   credit_agreement_content     credit_agreement_content[]
   credit_transaction           credit_transaction[]
   credit_transfer_content      credit_transfer_content[]
@@ -297,7 +273,6 @@ model credit_transaction {
   weight_class_id                                             Int
   number_of_credits                                           Int
   total_value                                                 Decimal                                @db.Decimal(20, 2)
-  account_balance                                             account_balance[]
   credit_agreement_credit_transaction                         credit_agreement_credit_transaction[]
   credit_class_code                                           credit_class_code                      @relation(fields: [credit_class_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "credit_transaction_credit_class_id_bbf2d758_fk_credit_cl")
   organization_credit_transaction_credit_to_idToorganization  organization?                          @relation("credit_transaction_credit_to_idToorganization", fields: [credit_to_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "credit_transaction_credit_to_id_4c437b49_fk_organization_id")
@@ -973,7 +948,6 @@ model organization {
   create_user                                                       String                   @db.VarChar(130)
   update_user                                                       String?                  @db.VarChar(130)
   first_model_year_id                                               Int?
-  account_balance                                                   account_balance[]
   credit_agreement                                                  credit_agreement[]
   credit_transaction_credit_transaction_credit_to_idToorganization  credit_transaction[]     @relation("credit_transaction_credit_to_idToorganization")
   credit_transaction_credit_transaction_debit_from_idToorganization credit_transaction[]     @relation("credit_transaction_debit_from_idToorganization")

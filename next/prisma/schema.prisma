@@ -56,8 +56,9 @@ enum Idp {
 
 model User {
   id             Int          @id @default(autoincrement())
-  email          String?
-  keycloakId     String?      @map("keycloak_id")
+  contactEmail   String?      @map("contact_email")
+  idpEmail       String       @map("idp_email")
+  idpSub         String?      @map("idp_sub")
   idp            Idp          @map("idp")
   idpUsername    String       @map("idp_username")
   isActive       Boolean      @default(true) @map("is_active")
@@ -65,6 +66,6 @@ model User {
   organizationId Int          @map("organization_id")
   roles          Role[]
 
-  @@unique([idp, idpUsername])
+  @@unique([idp, idpUsername, idpEmail])
   @@map("user")
 }
