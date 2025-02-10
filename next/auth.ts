@@ -10,6 +10,9 @@ import { getIdpEnum } from "./lib/utils/getEnums";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Keycloak],
+  session: {
+    maxAge: 60 * 60 * 8,
+  },
   callbacks: {
     async jwt({ token, account, profile, trigger }) {
       if (trigger === "signIn") {
@@ -38,6 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (user && user.isActive) {
           token.roles = user.roles;
           token.isGovernment = user.organization.isGovernment;
+          token.organizationId = user.organizationId;
           return token;
         }
         if (!user) {
@@ -51,6 +55,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.idToken = token.idToken;
       session.user.roles = token.roles;
       session.user.isGovernment = token.isGovernment;
+      session.user.organizationId = token.organizationId;
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {

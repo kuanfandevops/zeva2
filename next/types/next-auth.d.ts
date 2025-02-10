@@ -3,6 +3,7 @@ declare module "@auth/core/types" {
     idToken?: string;
     roles?: $Enums.Role[];
     isGovernment?: Boolean;
+    organizationId?: number;
   }
 }
 
@@ -19,6 +20,7 @@ declare module "@auth/core/jwt" {
     idToken?: string;
     roles?: $Enums.Role[];
     isGovernment?: Boolean;
+    organizationId?: number;
   }
 }
 
