@@ -4,15 +4,17 @@
 
 Nextjs is a full-stack web application framework built on top of React that utilizes server-side rendering (SSR).
 
-Please read the following texts: 
+Please read the following texts:
+
 (1) https://nextjs.org/learn/react-foundations/what-is-react-and-nextjs (currently, 10 chapters)
+
 (2) https://nextjs.org/learn/dashboard-app/getting-started (currently, 16 chapters)
 
 Documentation: https://nextjs.org/docs
 
 Please note:
 
-(1) We're using Auth.js (https://authjs.dev/) for authentication/authorization; as per the docs: "You should not rely on middleware exclusively for authorization. Always ensure that the session is verified as close to your data fetching as possible." Therefore, a suggested guideline is that functions that read from the database always call `auth()` and use the returned user information to condition access (see `app/usersExample/lib.data.ts`).
+(1) We're using Auth.js (https://authjs.dev/) for authentication/authorization; as per the docs: "You should not rely on middleware exclusively for authorization. Always ensure that the session is verified as close to your data fetching as possible." Therefore, a suggested guideline is that functions that read from the database always call `auth()` and use the returned user information to condition access (see `app/usersExample/lib/data.ts`).
 
 (2) Nextjs actions, as defined by the `"use server"` directive, expose endpoints for users to call, and so they must also be protected in the same way outlined above. Please note that arguments that are bound server-side to an action will also be exposed to users if the action is used in a client component.
 
