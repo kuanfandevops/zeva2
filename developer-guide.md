@@ -71,10 +71,15 @@ Coming soon - perhaps BullMQ? (https://docs.bullmq.io/)
 Suggested Dockerfile build steps, which assumes a base node image; in development, we're currently using node 22.13.1:
 
 (1) Copy over the contents of zeva2/next
+
 (2) Install dependencies (`npm install`); should only need non-dev dependencies.
+
 (3) Execute `npm run generatePrismaSchema`.
+
 (4) Execute `npm run build`.
+
 (5) Expose port 3000.
+
 (6) Set `npm run start` as the startup command (using, for example, CMD).
 
 Deployment notes:
