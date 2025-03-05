@@ -46,7 +46,7 @@ Docs: https://www.typescriptlang.org/docs/handbook/intro.html
 
 Please note:
 
-(1) TypeScript will have to be installed outside of your `next` container in order for you to experience, in a TypeScript project, the VS code IntelliSense features (code completion, navigation, errors/warnings, etc.). In the `zeva2` project folder outside of your container, you can execute `npm install` to install TypeScript outside of the container.
+(1) TypeScript will have to be installed outside of your `next` container in order for you to experience, in a TypeScript project, the VS code IntelliSense features (code completion, navigation, errors/warnings, etc.). In the `next` project folder outside of your container, you can execute `npm install` to install TypeScript outside of the container.
 
 ## Styling
 
@@ -68,5 +68,24 @@ Coming soon - perhaps BullMQ? (https://docs.bullmq.io/)
 
 ## DevOps
 
-Coming soon!
+Suggested Dockerfile build steps, which assumes a base node image; in development, we're currently using node 22.13.1:
 
+(1) Copy over the contents of zeva2/next
+(2) Install dependencies (`npm install`); should only need non-dev dependencies.
+(3) Execute `npm run generatePrismaSchema`.
+(4) Execute `npm run build`.
+(5) Expose port 3000.
+(6) Set `npm run start` as the startup command (using, for example, CMD).
+
+Deployment notes:
+
+(1) Once the database container is running, we will need to execute, in an equivalent environment
+outlined in the build steps above (one with the dependencies installed): `npm run pushSchemaToDB`.
+This command creates/updates database tables; this command will be replaced with a command
+that applies database migrations once the schema is more fully built out.
+
+(2) Environment variables: please see the `environment` section under the `next` service of the
+`docker-compose` file. Please note that the `DATABASE_URL` and `DATABASE_URL_OLD` connection strings
+have the format: `postgresql://{db_username}:{db_password}@{db_hostname_or_ip_address}:{db_port}/{db_name}?schema={db_schema_name}`
+In order for the `next` app to connect to the old zeva database, a network policy will probably have to be created;
+the `next` app's access to the old database should be read-only.
