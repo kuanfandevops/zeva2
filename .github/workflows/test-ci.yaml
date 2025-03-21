@@ -148,5 +148,5 @@ jobs:
           git config --global user.name "GitHub Actions"
           git add zeva2/zeva2-next/values-test.yaml
           git add zeva2/zeva2-bullmq/values-test.yaml
-          git commit -m "Update the zeva2-next image tags to ${{ env.VERSION }} on Test"
+          git commit -m "Update the zeva2 image tags to ${{ env.VERSION }} on Test"
           git push
