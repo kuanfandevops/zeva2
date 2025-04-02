@@ -1,0 +1,54 @@
+name: PR Build on Dev
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+    branches:
+      - develop
+      - release/*
+
+env:
+  GIT_URL: https://github.com/bcgov/zeva2.git
+  TOOLS_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE_PLATE }}-tools
+  DEV_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE_PLATE }}-dev
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  GIT_REF: ${{ github.event.pull_request.head.ref }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  versioning:
+    if: >
+      (github.event.action == 'labeled' && github.event.label.name == 'build' && github.event.pull_request.base.ref == 'develop') ||
+      (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'build') && github.event.pull_request.base.ref == 'develop')
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      VERSION: ${{ steps.export-version.outputs.VERSION }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.1.11
+        with:
+          versionSpec: "6.0.x"
+
+      - name: Determine Version
+        id: version-step # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v3.1.11
+        with:
+          useConfigFile: true
+
+      - name: Export Version
+        id: export-version
+        run: |
+          echo "VERSION=${{ steps.version-step.outputs.SemVer }}"
+          echo "VERSION=${{ steps.version-step.outputs.SemVer }}" >> $GITHUB_OUTPUT
