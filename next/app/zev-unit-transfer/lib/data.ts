@@ -17,6 +17,54 @@ export type ZevUnitTransferWithContentAndOrgs = {
   transferTo: Organization;
 } & ZevUnitTransfer;
 
+export const getZevUnitTransfers = async (): Promise<
+  ZevUnitTransferWithContentAndOrgs[]
+> => {
+  const session = await auth();
+  const userIsGov = session?.user?.isGovernment;
+  const userOrgId = session?.user?.organizationId;
+
+  if (userIsGov) {
+    return await prisma.zevUnitTransfer.findMany({
+      where: {
+        ZevUnitTransferHistory: {
+          some: {
+            afterUserActionStatus:
+              ZevUnitTransferStatuses.APPROVED_BY_TRANSFER_TO,
+          },
+        },
+      },
+      include: {
+        zevUnitTransferContent: true,
+        transferFrom: true,
+        transferTo: true,
+      },
+    });
+  } else {
+    return await prisma.zevUnitTransfer.findMany({
+      where: {
+        OR: [
+          { transferFromId: userOrgId },
+          {
+            transferToId: userOrgId,
+            status: {
+              notIn: [
+                ZevUnitTransferStatuses.DRAFT,
+                ZevUnitTransferStatuses.DELETED,
+              ],
+            },
+          },
+        ],
+      },
+      include: {
+        zevUnitTransferContent: true,
+        transferFrom: true,
+        transferTo: true,
+      },
+    });
+  }
+};
+
 export const getZevUnitTransfer = async (
   id: number,
 ): Promise<ZevUnitTransferWithContentAndOrgs | null> => {
