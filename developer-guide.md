@@ -1,5 +1,5 @@
 # Developer Guidelines
-
+update from develop branch
 ## NEXT.js (app router)
 
 Nextjs is a full-stack web application framework built on top of React that utilizes server-side rendering (SSR).

@@ -1,0 +1,45 @@
+ # This workflow builds and deploys the Zeva2 application to the production environment in OpenShift.
+
+name: Zeva2 Prod CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  versioning:
+    runs-on: ubuntu-latest
+
+    outputs:
+      VERSION: ${{ steps.export-version.outputs.VERSION }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.1.11
+        with:
+          versionSpec: "6.0.x"
+
+      - name: Determine Version
+        id: version-step # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v3.1.11
+        with:
+          useConfigFile: true
+
+      - name: Export Version
+        id: export-version
+        run: |
+          echo "VERSION=${{ steps.version-step.outputs.SemVer }}"
+          echo "VERSION=${{ steps.version-step.outputs.SemVer }}" >> $GITHUB_OUTPUT
+  
