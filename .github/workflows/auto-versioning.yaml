@@ -30,7 +30,7 @@ jobs:
           /opt/hostedtoolcache/GitVersion.Tool/6.0.5/dotnet-gitversion /showconfig
 
       - name: Determine Version
-        id: version_step # step id used as reference for output values
+        id: version-step # step id used as reference for output values
         uses: gittools/actions/gitversion/execute@v3.1.11
         with:
           useConfigFile: true
