@@ -1,18 +1,10 @@
 name: PR Build on Dev
 
-on:
-  pull_request:
+  pull_request_target:
     types: [labeled, synchronize]
     branches:
       - develop
       - release/*
-
-env:
-  GIT_URL: https://github.com/bcgov/zeva2.git
-  TOOLS_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE_PLATE }}-tools
-  DEV_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE_PLATE }}-dev
-  PR_NUMBER: ${{ github.event.pull_request.number }}
-  GIT_REF: ${{ github.event.pull_request.head.ref }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,8 +14,8 @@ jobs:
 
   versioning:
     if: >
-      (github.event.action == 'labeled' && github.event.label.name == 'build' && github.event.pull_request.base.ref == 'develop') ||
-      (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'build') && github.event.pull_request.base.ref == 'develop')
+      (github.event.action == 'labeled' && github.event.label.name == 'build' && ( github.event.pull_request.base.ref == 'develop' || startsWith( github.event.pull_request.base.ref, 'release' ) ) ) ||
+      (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'build') && ( github.event.pull_request.base.ref == 'develop' || startsWith( github.event.pull_request.base.ref, 'release' ) ) )
 
     runs-on: ubuntu-latest
 
@@ -35,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.1.11
@@ -47,8 +40,22 @@ jobs:
         with:
           useConfigFile: true
 
+      - name: Show GitVersion Config
+        run: |
+          pwd
+          ls -l /opt/hostedtoolcache/GitVersion.Tool
+          /opt/hostedtoolcache/GitVersion.Tool/6.0.5/dotnet-gitversion /showconfig
+          
+      # The original version fron gitversion is in the format 0.1.0-alpha.91
+      # We need to change the alpha to pr<pr_number> so that we can deploy to dev
+      # The version will be in the format 0.1.0-pr<pr_number>.91
+      # The reason gitversion used the lable alpha is we use the pull_request_target event
       - name: Export Version
         id: export-version
         run: |
-          echo "VERSION=${{ steps.version-step.outputs.SemVer }}"
-          echo "VERSION=${{ steps.version-step.outputs.SemVer }}" >> $GITHUB_OUTPUT
+          VERSION="${{ steps.version-step.outputs.SemVer }}"
+          echo "ORIGINAL_VERSION=${VERSION}"
+          PR_NUMBER="${{ env.PR_NUMBER }}"
+          UPDATED_VERSION="${VERSION/alpha/pr${PR_NUMBER}}"
+          echo "VERSION=${UPDATED_VERSION}"
+          echo "VERSION=${UPDATED_VERSION}" >> $GITHUB_OUTPUT
