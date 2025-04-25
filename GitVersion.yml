@@ -1,8 +1,13 @@
 workflow: GitFlow/v1
 branches:
+  develop:
+    mode: ContinuousDelivery
   feature:
     mode: ContinuousDelivery
   release:
     mode: ContinuousDelivery
+  main:
+    mode: ContinuousDelivery
   pull-request:
+    mode: ContinuousDelivery
     label: pr
