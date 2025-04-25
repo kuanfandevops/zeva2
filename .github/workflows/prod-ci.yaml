@@ -18,10 +18,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
+  on-merge-only:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR #${{ github.event.pull_request.number }} was merged from ${{ github.event.pull_request.head.ref }}"
+  
   versioning:
     runs-on: ubuntu-latest
-
+    needs: [on-merge-only]
     outputs:
       VERSION: ${{ steps.export-version.outputs.VERSION }}
 
