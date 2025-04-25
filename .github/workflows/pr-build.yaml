@@ -1,5 +1,6 @@
 name: PR Build on Dev
 
+on:
   pull_request_target:
     types: [labeled, synchronize]
     branches:
