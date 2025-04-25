@@ -2,6 +2,8 @@ workflow: GitFlow/v1
 branches:
   develop:
     mode: ContinuousDelivery
+    prevent-increment:
+      of-merged-branch: true
   feature:
     mode: ContinuousDelivery
   release:
