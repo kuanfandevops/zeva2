@@ -22,8 +22,10 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - run: echo "PR #${{ github.event.pull_request.number }} was merged from ${{ github.event.pull_request.head.ref }}"
-  
+      - name: show pr
+        run: |
+         echo "PR #${{ github.event.pull_request.number }} was merged from ${{ github.event.pull_request.head.ref }}"
+       
   versioning:
     runs-on: ubuntu-latest
     needs: [on-merge-only]
