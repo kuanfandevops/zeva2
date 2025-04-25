@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to operate on'
+        description: 'Please carefully choose the branch merged into main, it impacts the versioning'
         required: false
 
 concurrency:
@@ -35,6 +35,8 @@ jobs:
         run: |
           ref="${{ github.event.pull_request.head.ref }}"   # e.g. "release/0.1.0"
           version="${ref##*/}"                              # => "0.1.0"
+          git config --global user.email "kuan.fan@gov.bc.ca"
+          git config --global user.name "Kuan Fan"
           git tag -a "$version" -m "prod-ci tag $version"
           git push origin "$version"
 
