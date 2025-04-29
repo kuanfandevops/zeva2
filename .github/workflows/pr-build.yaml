@@ -11,8 +11,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
+env:
+  PR_NUMBER: ${{ github.event.pull_request.number }}
 
+jobs:
   versioning:
     if: >
       (github.event.action == 'labeled' && github.event.label.name == 'build' && ( github.event.pull_request.base.ref == 'develop' || startsWith( github.event.pull_request.base.ref, 'release' ) ) ) ||
@@ -46,7 +48,7 @@ jobs:
           pwd
           ls -l /opt/hostedtoolcache/GitVersion.Tool
           /opt/hostedtoolcache/GitVersion.Tool/6.0.5/dotnet-gitversion /showconfig
-          
+
       # The original version fron gitversion is in the format 0.1.0-alpha.91
       # We need to change the alpha to pr<pr_number> so that we can deploy to dev
       # The version will be in the format 0.1.0-pr<pr_number>.91
